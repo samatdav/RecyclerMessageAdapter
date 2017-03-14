@@ -288,30 +288,32 @@ public class RecyclerMessageAdapter extends RecyclerView.Adapter<RecyclerView.Vi
      * @param message Message to be added
      */
     public void addNewMessage(Message message) {
-        MessageHeaderParent item = null;
-        for (int i = getItemCount(false) - 1; i > 1; i--) {
-            //Find the last header and check if it belongs to this message!
-            if (items.get(i) instanceof MessageHeaderParent) {
-                item = (MessageHeaderParent) items.get(i);
-                if (!item.getId().equals(message.getIdForHolder())) {
-                    item = null;
+        if(!startedFromFilter) {
+            MessageHeaderParent item = null;
+            for (int i = getItemCount(false) - 1; i > 1; i--) {
+                //Find the last header and check if it belongs to this message!
+                if (items.get(i) instanceof MessageHeaderParent) {
+                    item = (MessageHeaderParent) items.get(i);
+                    if (!item.getId().equals(message.getIdForHolder())) {
+                        item = null;
+                    }
+                    break;
                 }
-                break;
             }
-        }
-        if (item == null) {
-            item = new MessageHeaderParent((message.getStream() == null) ? null :
-                    message.getStream().getName(), message.getSubject(), message.getIdForHolder(), message);
-            item.setMessageType(message.getType());
-            item.setDisplayRecipent(message.getDisplayRecipient(zulipApp));
-            if (message.getType() == MessageType.STREAM_MESSAGE)
-                item.setMute(mMutedTopics.isTopicMute(message));
-            item.setColor((message.getStream() == null) ? mDefaultStreamHeaderColor : message.getStream().getParsedColor());
-            items.add(getItemCount(true) - 1, item);
+            if (item == null) {
+                item = new MessageHeaderParent((message.getStream() == null) ? null :
+                        message.getStream().getName(), message.getSubject(), message.getIdForHolder(), message);
+                item.setMessageType(message.getType());
+                item.setDisplayRecipent(message.getDisplayRecipient(zulipApp));
+                if (message.getType() == MessageType.STREAM_MESSAGE)
+                    item.setMute(mMutedTopics.isTopicMute(message));
+                item.setColor((message.getStream() == null) ? mDefaultStreamHeaderColor : message.getStream().getParsedColor());
+                items.add(getItemCount(true) - 1, item);
+                notifyItemInserted(getItemCount(true) - 1);
+            }
+            items.add(getItemCount(true) - 1, message);
             notifyItemInserted(getItemCount(true) - 1);
         }
-        items.add(getItemCount(true) - 1, message);
-        notifyItemInserted(getItemCount(true) - 1);
     }
 
 
